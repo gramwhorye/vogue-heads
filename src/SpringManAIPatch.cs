@@ -4,7 +4,7 @@ using System;
 using BepInEx.Logging;
 using HarmonyLib;
 using UnityEngine;
-using Random = System.Random;
+using Random = UnityEngine.Random;
 
 namespace VogueHeads
 {
@@ -22,7 +22,18 @@ namespace VogueHeads
             "assets/audioclip/work2.mp3"
         ];
 
-        private const string animatorProp = "stopPose";
+        private static string[] animatorTriggerPrefix = [
+            "vogue-tilted",
+            "vogue-trade",
+            "vogue-duck",
+            "vogue-serve",
+            "dab"
+        ];
+
+        private static string[] stopPositionSuffix = [
+            "-left",
+            "-right"
+        ];
 
         private static ManualLogSource logger { get; set; }
 
@@ -65,7 +76,10 @@ namespace VogueHeads
             {
                 logger.LogError("Couldn't load animator: " + ex.Message);
             }
-            callouts = [];
+            if (callouts == null) {
+                callouts = new AudioClip[calloutNames.Length];
+            }
+            var calloutIndex = 0;
             foreach (string calloutFileName in calloutNames)
             {
                 try
@@ -73,7 +87,8 @@ namespace VogueHeads
                     AudioClip callout = bundle.LoadAsset<AudioClip>(calloutFileName);
                     if (callout != null)
                     {
-                        callouts.AddItem(callout);
+                        callouts[calloutIndex] = callout;
+                        calloutIndex++;
                     }
                     else
                     {
@@ -85,6 +100,7 @@ namespace VogueHeads
                     logger.LogError("Couldn't load audio clip: " + ex.Message);
                 }
             }
+            logger.LogInfo($"Loaded {callouts.Length} audio clips");
         }
 
         [HarmonyPostfix]
@@ -105,6 +121,7 @@ namespace VogueHeads
                 {
                     logger.LogWarning("Couldn't find animator");
                 }
+                logger.LogInfo($"There are currently {callouts.Length} callouts");
             }
             else
             {
@@ -130,15 +147,18 @@ namespace VogueHeads
         public static void PostUpdate(SpringManAI __instance, ref State __state)
         {
             bool shouldStop = hasStoppedRef(__instance);
-            if (__state.HasStopped != shouldStop)
+            if (__state.HasStopped != shouldStop && shouldStop)
             {
-                if (shouldStop)
-                {
-                    logger.LogInfo("animator must stop");
-                    AnimationStopPoints whichSet = animStopPointsRef(__instance);
-                    // 5 animation clips
-                    var pose = 1 + (2 * (new Random()).Next(5)) + whichSet.animationPosition;
-                    creatureAnimatorRef(__instance).SetInteger(animatorProp, pose);
+                try {
+                    var poseSuffix = stopPositionSuffix[animStopPointsRef(__instance).animationPosition % 2];
+                    var posePrefixIndex = Random.Range(0, animatorTriggerPrefix.Length);
+                    var posePrefix = animatorTriggerPrefix[posePrefixIndex];
+                    creatureAnimatorRef(__instance).SetTrigger($"{posePrefix}{poseSuffix}");
+                }
+                catch (Exception ex) {
+                        logger.LogWarning($"Failed to set pose: {ex.Message}");
+                }
+                if (callouts.Length > 0) {
                     try {
                         AudioSource SFX = creatureSFXRef(__instance);
                         if (SFX != null) {
@@ -147,13 +167,10 @@ namespace VogueHeads
                             logger.LogWarning("Couldn't find sound effect source");
                         }
                     } catch (Exception ex) {
-                        logger.LogWarning($"Failed to play audio clip: {ex.Message}")
+                        logger.LogWarning($"Failed to play audio clip: {ex.Message}");
                     }
-                }
-                else
-                {
-                    logger.LogInfo("animator must start");
-                    creatureAnimatorRef(__instance).SetInteger(animatorProp, 0);
+                } else {
+                    logger.LogWarning("There are no callout audio clips available");
                 }
             }
         }
