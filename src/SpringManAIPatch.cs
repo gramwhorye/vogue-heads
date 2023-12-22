@@ -65,7 +65,7 @@ namespace VogueHeads
                 voguePoses = bundle.LoadAsset<RuntimeAnimatorController>(assetName);
                 if (voguePoses != null)
                 {
-                    logger.LogInfo($"Loaded poses: {assetName}");
+                    logger.LogInfo($"Loaded poses");
                 }
                 else
                 {
@@ -109,8 +109,6 @@ namespace VogueHeads
         {
             if (voguePoses != null)
             {
-                logger.LogInfo("Replacing animator on coilhead");
-
                 Animator animator = ((Component)((object)__instance)).transform.Find("SpringManModel").Find("AnimContainer").gameObject.GetComponent<Animator>();
                 if (animator != null)
                 {
@@ -121,7 +119,6 @@ namespace VogueHeads
                 {
                     logger.LogWarning("Couldn't find animator");
                 }
-                logger.LogInfo($"There are currently {callouts.Length} callouts");
             }
             else
             {
