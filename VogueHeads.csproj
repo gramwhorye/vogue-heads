@@ -25,5 +25,9 @@
 	  <Reference Include="Unity.Netcode.Runtime">
 	    <HintPath>libs\Unity.Netcode.Runtime.dll</HintPath>
 	  </Reference>
+	  <Reference Include="UnityEngine.CoreModule">
+  		<Aliases>CoreModule</Aliases>
+	    <HintPath>libs\UnityEngine.CoreModule.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 </Project>
