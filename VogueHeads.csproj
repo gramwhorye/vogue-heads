@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net47</TargetFramework>
-		<AssemblyName>dev.femmeboy.vogueheads</AssemblyName>
+		<AssemblyName>com.github.gramwhorye.vogueheads</AssemblyName>
 		<Product>VogueHeads</Product>
-		<Description>Lethal Company mod that unleashes coilheads modeling potential.</Description>
-		<Version>1.0.0</Version>
+		<Description>Asset replacement for Coilheads to turn their bland static poses into dramatic vogues.</Description>
+		<Version>0.1.0</Version>
 		<PublishSingleFile>true</PublishSingleFile>
 		<LangVersion>latest</LangVersion>
 		<RestoreProjectStyle>PackageReference</RestoreProjectStyle>
@@ -28,6 +28,10 @@
 	  <Reference Include="UnityEngine.CoreModule">
   		<Aliases>CoreModule</Aliases>
 	    <HintPath>libs\UnityEngine.CoreModule.dll</HintPath>
+	  </Reference>
+	  <Reference Include="UnityEngine.AudioModule">
+  		<Aliases>AudioModule</Aliases>
+	    <HintPath>libs\UnityEngine.AudioModule.dll</HintPath>
 	  </Reference>
 	</ItemGroup>
 </Project>
